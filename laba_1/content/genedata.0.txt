@@ -1,0 +1,35 @@
+Yakimovich Nikita
+Genetic Searching
+--------------------------------------------------------------------------
+001   search   SIIK
+organism					protein
+Homo sapiens (Human)		6.8 kDa mitochondrial proteolipid
+--------------------------------------------------------------------------
+002   search   PLML
+organism					protein
+NOT FOUND
+--------------------------------------------------------------------------
+003   search   FKIII
+organism					protein
+NOT FOUND
+--------------------------------------------------------------------------
+004   diff   6.8 kDa mitochondrial proteolipid   Alcohol dehydrogenase
+amino-acids difference:
+MISSING:	
+--------------------------------------------------------------------------
+005   diff   RNA-dependent RNA polymerase [Fragment]   Alcohol dehydrogenase
+amino-acids difference:
+MISSING:	
+--------------------------------------------------------------------------
+006   diff   Cecropin   Pre-T/NK cell associated protein 6H9A
+amino-acids difference:
+MISSING:	
+--------------------------------------------------------------------------
+007   mode   Cecropin
+amino-acid occurs:
+MISSING: Cecropin
+--------------------------------------------------------------------------
+008   mode   Alcohol dehydrogenase
+amino-acid occurs:
+MISSING: Alcohol dehydrogenase
+--------------------------------------------------------------------------

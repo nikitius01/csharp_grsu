@@ -1,0 +1,27 @@
+Yakimovich Nikita
+Genetic Searching
+--------------------------------------------------------------------------
+001   mode   PREDICTED: similar to double homeobox
+amino-acid occurs:
+MISSING: PREDICTED: similar to double homeobox
+--------------------------------------------------------------------------
+002   search   LKSQ
+organism					protein
+NOT FOUND
+--------------------------------------------------------------------------
+003   diff   C-FLIP AMPA glutamate   6.8 kDa mitochondrial proteolipid
+amino-acids difference:
+MISSING:	
+--------------------------------------------------------------------------
+004   mode   Lsm3 protein
+amino-acid occurs:
+MISSING: Lsm3 protein
+--------------------------------------------------------------------------
+005   diff   Lsm3 protein   Drosophila melanogaster [Fragment]
+amino-acids difference:
+MISSING:	
+--------------------------------------------------------------------------
+006   search   TPRFGKTFDA
+organism					protein
+NOT FOUND
+--------------------------------------------------------------------------
