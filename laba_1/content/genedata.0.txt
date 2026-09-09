@@ -15,15 +15,15 @@ NOT FOUND
 --------------------------------------------------------------------------
 004   diff   6.8 kDa mitochondrial proteolipid   Alcohol dehydrogenase
 amino-acids difference:
-MISSING:	
+MISSING:	Alcohol dehydrogenase
 --------------------------------------------------------------------------
 005   diff   RNA-dependent RNA polymerase [Fragment]   Alcohol dehydrogenase
 amino-acids difference:
-MISSING:	
+MISSING:	RNA-dependent RNA polymerase [Fragment]	Alcohol dehydrogenase
 --------------------------------------------------------------------------
 006   diff   Cecropin   Pre-T/NK cell associated protein 6H9A
 amino-acids difference:
-MISSING:	
+MISSING:	Cecropin	Pre-T/NK cell associated protein 6H9A
 --------------------------------------------------------------------------
 007   mode   Cecropin
 amino-acid occurs:
