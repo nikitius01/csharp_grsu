@@ -11,22 +11,14 @@ internal static class Program
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        try
-        {
-            var input = args.Length > 0 ? args[0] : SelectInputFile();
-            var output = args.Length > 1 ? args[1] : GetOutputPath(input);
+        var input = args.Length > 0 ? args[0] : SelectInputFile();
+        var output = args.Length > 1 ? args[1] : GetOutputPath(input);
 
-            var application = new ConsoleApplication(
-                new TextFileService(),
-                new CommandParser());
+        var application = new ConsoleApplication(
+            new TextFileService(),
+            new CommandParser());
 
-            application.Run(input, output);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Ошибка: {ex.Message}");
-            Environment.ExitCode = 1;
-        }
+        application.Run(input, output);
     }
 
     private static string SelectInputFile()
