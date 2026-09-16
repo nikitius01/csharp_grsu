@@ -5,7 +5,7 @@ namespace laba_3.Models;
 
 public sealed class Sentence
 {
-    private const string NoSpaceBefore = ".,!?;:%)]}»…";
+    private const string NoSpaceBefore = ".,!?;:%)]}»…”";
     private const string NoSpaceAfter = "([{«";
 
     [XmlElement("word", typeof(Word))]
@@ -30,22 +30,40 @@ public sealed class Sentence
     {
         var result = new StringBuilder();
         Token? previous = null;
+        var straightQuoteIsOpen = false;
+        var previousOpensQuote = false;
 
         foreach (var token in Tokens)
         {
-            if (NeedsSpace(previous, token))
+            var isStraightQuote = token is Punctuation { Value: "\"" };
+            var closesStraightQuote = isStraightQuote && straightQuoteIsOpen;
+            var opensQuote = token is Punctuation { Value: "“" } ||
+                             isStraightQuote && !straightQuoteIsOpen;
+
+            if (NeedsSpace(previous, token, previousOpensQuote, closesStraightQuote))
                 result.Append(' ');
 
             result.Append(token.Value);
             previous = token;
+            previousOpensQuote = opensQuote;
+
+            if (isStraightQuote)
+                straightQuoteIsOpen = !straightQuoteIsOpen;
         }
 
         return result.ToString();
     }
 
-    private static bool NeedsSpace(Token? previous, Token current)
+    private static bool NeedsSpace(
+        Token? previous,
+        Token current,
+        bool previousOpensQuote,
+        bool closesStraightQuote)
     {
         if (previous is null)
+            return false;
+
+        if (previousOpensQuote || closesStraightQuote)
             return false;
 
         if (current is Punctuation && current.Value.Length == 1 && NoSpaceBefore.Contains(current.Value[0]))

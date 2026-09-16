@@ -5,7 +5,7 @@ namespace laba_3.Models;
 [XmlRoot("text")]
 public sealed class Text
 {
-    private const string Vowels = "aeiouyаеёиоуыэюя";
+    private const string Vowels = "aeiouаеёиоуыэюя";
 
     [XmlElement("sentence")]
     public List<Sentence> Sentences { get; set; } = [];

@@ -22,18 +22,21 @@ public sealed partial class TextParser
         var text = new TextModel();
         var sentence = new Sentence();
         var sentenceEnded = false;
+        var straightQuoteIsOpen = false;
 
         foreach (Match match in TokenPattern().Matches(source))
         {
             var value = match.Value;
             var isWord = char.IsLetterOrDigit(value[0]);
 
+            var startsQuotedFragment = value == "\"" && !straightQuoteIsOpen;
             if (sentence.Tokens.Count > 0 && sentenceEnded &&
-                (isWord || IsOpeningPunctuation(value)))
+                (isWord || IsOpeningPunctuation(value) || startsQuotedFragment))
             {
                 text.Sentences.Add(sentence);
                 sentence = new Sentence();
                 sentenceEnded = false;
+                straightQuoteIsOpen = false;
             }
 
             Token token = isWord
@@ -41,6 +44,9 @@ public sealed partial class TextParser
                 : new Punctuation(value);
 
             sentence.Tokens.Add(token);
+
+            if (value == "\"")
+                straightQuoteIsOpen = !straightQuoteIsOpen;
 
             if (token is Punctuation punctuation && IsSentenceEnding(punctuation.Value))
                 sentenceEnded = true;
