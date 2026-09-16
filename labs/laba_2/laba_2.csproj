@@ -8,11 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Legacy versions conflict with the types under Domain/. -->
-    <Compile Remove="Game.cs" />
-    <Compile Remove="Player.cs" />
-    <Compile Remove="PlayerState.cs" />
-
     <None Update="content/*ChaseData.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
