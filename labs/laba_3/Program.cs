@@ -1,14 +1,11 @@
 using System.Text;
 using laba_3.Models;
-using laba_3.Services;
 using TextModel = laba_3.Models.Text;
 
 namespace laba_3;
 
 public static class Program
 {
-    private static readonly TextParser Parser = new();
-
     public static void Main(string[] args)
     {
         Console.OutputEncoding = Encoding.UTF8;
@@ -40,7 +37,7 @@ public static class Program
 
     private static void Run(string inputPath, string stopWordsPath)
     {
-        var text = Parser.ParseFile(inputPath);
+        var text = TextModel.ParseFile(inputPath);
         Console.WriteLine($"Загружено предложений: {text.Sentences.Count}");
 
         while (true)
