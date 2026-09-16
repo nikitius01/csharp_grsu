@@ -17,9 +17,6 @@ internal sealed class Game
 
     public Game(int boardSize)
     {
-        if (boardSize <= 0)
-            throw new ArgumentOutOfRangeException(nameof(boardSize), "Размер поля должен быть положительным.");
-
         _boardSize = boardSize;
     }
 

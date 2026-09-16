@@ -9,15 +9,48 @@ internal static class Program
     {
         Console.OutputEncoding = Encoding.UTF8;
 
+        try
+        {
+            Run(args);
+        }
+        catch (FileNotFoundException exception)
+        {
+            PrintError($"Файл не найден: {exception.FileName ?? exception.Message}");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            PrintError("Нет доступа к указанному файлу.");
+        }
+        catch (IOException exception)
+        {
+            PrintError($"Ошибка при работе с файлом: {exception.Message}");
+        }
+        catch (Exception exception)
+        {
+            PrintError(exception.Message);
+        }
+    }
+
+    private static void Run(string[] args)
+    {
         var inputPath = args.Length > 0 ? args[0] : SelectInputFile();
+        if (inputPath is null)
+            return;
+
         var outputPath = args.Length > 1 ? args[1] : GetOutputPath(inputPath);
         var lines = File.ReadAllLines(inputPath);
 
         if (lines.Length == 0)
-            throw new InvalidOperationException("Входной файл пуст.");
+        {
+            PrintError("Входной файл пуст.");
+            return;
+        }
 
-        if (!int.TryParse(lines[0].Trim(), out var boardSize))
-            throw new FormatException("Первая строка должна содержать размер поля.");
+        if (!int.TryParse(lines[0].Trim(), out var boardSize) || boardSize <= 0)
+        {
+            PrintError("Первая строка должна содержать положительный размер поля.");
+            return;
+        }
 
         var game = new Game(boardSize);
         var log = new StringBuilder()
@@ -32,7 +65,11 @@ internal static class Program
             if (line.Length == 0)
                 continue;
 
-            ExecuteCommand(line, game, log);
+            if (!TryExecuteCommand(line, game, log))
+            {
+                PrintError($"Некорректная команда: {line}");
+                return;
+            }
 
             if (game.IsFinished)
                 break;
@@ -45,28 +82,28 @@ internal static class Program
         Console.WriteLine(result);
     }
 
-    private static void ExecuteCommand(string line, Game game, StringBuilder log)
+    private static bool TryExecuteCommand(string line, Game game, StringBuilder log)
     {
         var parts = line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
 
         if (parts.Length == 1 && parts[0].Equals("P", StringComparison.OrdinalIgnoreCase))
         {
             AppendState(log, game);
-            return;
+            return true;
         }
 
         if (parts.Length != 2 ||
             !int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var steps))
-        {
-            throw new FormatException($"Некорректная команда: {line}");
-        }
+            return false;
 
         if (parts[0].Equals("M", StringComparison.OrdinalIgnoreCase))
             game.MoveMouse(steps);
         else if (parts[0].Equals("C", StringComparison.OrdinalIgnoreCase))
             game.MoveCat(steps);
         else
-            throw new FormatException($"Некорректная команда: {line}");
+            return false;
+
+        return true;
     }
 
     private static void AppendState(StringBuilder log, Game game)
@@ -97,7 +134,7 @@ internal static class Program
     private static string FormatPosition(int? position) =>
         position?.ToString(CultureInfo.InvariantCulture) ?? "??";
 
-    private static string SelectInputFile()
+    private static string? SelectInputFile()
     {
         var contentDirectory = Path.Combine(Directory.GetCurrentDirectory(), "content");
         var files = Directory
@@ -106,7 +143,10 @@ internal static class Program
             .ToArray();
 
         if (files.Length == 0)
-            throw new FileNotFoundException("Не найдено ни одного файла *ChaseData.txt.");
+        {
+            PrintError("Не найдено ни одного файла *ChaseData.txt.");
+            return null;
+        }
 
         Console.WriteLine("Выберите входной файл:");
         for (var i = 0; i < files.Length; i++)
@@ -139,4 +179,7 @@ internal static class Program
             Path.GetDirectoryName(Path.GetFullPath(inputPath))!,
             $"{prefix}PursuitLog.txt");
     }
+
+    private static void PrintError(string message) =>
+        Console.Error.WriteLine($"Ошибка: {message}");
 }
