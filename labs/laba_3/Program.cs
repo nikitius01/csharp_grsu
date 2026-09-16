@@ -135,8 +135,7 @@ public static class Program
 
     private static void RemoveStopWords(TextModel text, string stopWordsPath)
     {
-        var stopWords = StopWordLoader.Load(stopWordsPath);
-        var removedCount = text.RemoveStopWords(stopWords);
+        var removedCount = text.RemoveStopWords(File.ReadLines(stopWordsPath));
 
         Console.WriteLine($"Удалено стоп-слов: {removedCount}");
         Console.WriteLine(text);
@@ -149,7 +148,7 @@ public static class Program
         if (string.IsNullOrWhiteSpace(outputPath))
             outputPath = "text.xml";
 
-        TextXmlExporter.Export(text, outputPath);
+        text.ExportToXml(outputPath);
         Console.WriteLine($"XML сохранён: {Path.GetFullPath(outputPath)}");
     }
 

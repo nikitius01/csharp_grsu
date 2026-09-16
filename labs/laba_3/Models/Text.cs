@@ -1,3 +1,5 @@
+using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace laba_3.Models;
@@ -80,6 +82,28 @@ public sealed class Text
         }
 
         return removedCount;
+    }
+
+    public void ExportToXml(string path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+
+        var fullPath = Path.GetFullPath(path);
+        var directory = Path.GetDirectoryName(fullPath);
+        if (!string.IsNullOrEmpty(directory))
+            Directory.CreateDirectory(directory);
+
+        var settings = new XmlWriterSettings
+        {
+            Encoding = new UTF8Encoding(false),
+            Indent = true
+        };
+
+        var namespaces = new XmlSerializerNamespaces();
+        namespaces.Add(string.Empty, string.Empty);
+
+        using var writer = XmlWriter.Create(fullPath, settings);
+        new XmlSerializer(typeof(Text)).Serialize(writer, this, namespaces);
     }
 
     public override string ToString() => string.Join(' ', Sentences);
