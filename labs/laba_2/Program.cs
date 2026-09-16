@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 
 namespace laba_2;
@@ -88,8 +88,7 @@ internal static class Program
             return true;
         }
 
-        if (parts.Length != 2 ||
-            !int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var steps))
+        if (parts.Length != 2 || !int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var steps))
             return false;
 
         if (parts[0].Equals("M", StringComparison.OrdinalIgnoreCase))
