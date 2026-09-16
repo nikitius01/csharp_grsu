@@ -53,11 +53,7 @@ internal static class Program
         }
 
         var game = new Game(boardSize);
-        var log = new StringBuilder()
-            .AppendLine("Cat and Mouse")
-            .AppendLine()
-            .AppendLine("Cat Mouse  Distance")
-            .AppendLine("-------------------");
+        var log = new GameLog();
 
         foreach (var rawLine in lines.Skip(1))
         {
@@ -75,20 +71,20 @@ internal static class Program
                 break;
         }
 
-        AppendFooter(log, game);
+        log.AppendFooter(game);
 
-        var result = log.ToString();
+        var result = log.Build();
         File.WriteAllText(outputPath, result, new UTF8Encoding(false));
         Console.WriteLine(result);
     }
 
-    private static bool TryExecuteCommand(string line, Game game, StringBuilder log)
+    private static bool TryExecuteCommand(string line, Game game, GameLog log)
     {
         var parts = line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
 
         if (parts.Length == 1 && parts[0].Equals("P", StringComparison.OrdinalIgnoreCase))
         {
-            AppendState(log, game);
+            log.AppendState(game);
             return true;
         }
 
@@ -105,34 +101,6 @@ internal static class Program
 
         return true;
     }
-
-    private static void AppendState(StringBuilder log, Game game)
-    {
-        var cat = FormatPosition(game.CatPosition);
-        var mouse = FormatPosition(game.MousePosition);
-        var distance = game.GetDistance();
-
-        if (distance.HasValue)
-            log.AppendLine($"{cat,3}  {mouse,5}{distance.Value,10}");
-        else
-            log.AppendLine($"{cat,3}  {mouse,5}");
-    }
-
-    private static void AppendFooter(StringBuilder log, Game game)
-    {
-        log.AppendLine("-------------------")
-            .AppendLine()
-            .AppendLine()
-            .AppendLine("Distance traveled:   Mouse    Cat")
-            .AppendLine($"                        {game.MouseDistance,2}     {game.CatDistance,2}")
-            .AppendLine()
-            .AppendLine(game.CaughtAt.HasValue
-                ? $"Mouse caught at:  {game.CaughtAt.Value}"
-                : "Mouse evaded Cat");
-    }
-
-    private static string FormatPosition(int? position) =>
-        position?.ToString(CultureInfo.InvariantCulture) ?? "??";
 
     private static string? SelectInputFile()
     {
