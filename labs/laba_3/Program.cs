@@ -12,8 +12,8 @@ public static class Program
 
         try
         {
-            var inputPath = args.Length > 0 ? args[0] : GetContentPath("input.txt");
-            var stopWordsPath = args.Length > 1 ? args[1] : GetContentPath("stopwords_ru.txt");
+            var inputPath = GetContentPath("input.txt");
+            var stopWordsPath = GetContentPath("stopwords_ru.txt");
 
             Run(inputPath, stopWordsPath);
         }
