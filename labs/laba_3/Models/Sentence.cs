@@ -10,7 +10,7 @@ public sealed class Sentence
 
     [XmlElement("word", typeof(Word))]
     [XmlElement("punctuation", typeof(Punctuation))]
-    public List<Token> Tokens { get; set; } = [];
+    public List<object> Tokens { get; set; } = [];
 
     [XmlIgnore]
     public IEnumerable<Word> Words => Tokens.OfType<Word>();
@@ -29,7 +29,7 @@ public sealed class Sentence
     public override string ToString()
     {
         var result = new StringBuilder();
-        Token? previous = null;
+        object? previous = null;
         var straightQuoteIsOpen = false;
         var previousOpensQuote = false;
 
@@ -43,7 +43,7 @@ public sealed class Sentence
             if (NeedsSpace(previous, token, previousOpensQuote, closesStraightQuote))
                 result.Append(' ');
 
-            result.Append(token.Value);
+            result.Append(token);
             previous = token;
             previousOpensQuote = opensQuote;
 
@@ -55,8 +55,8 @@ public sealed class Sentence
     }
 
     private static bool NeedsSpace(
-        Token? previous,
-        Token current,
+        object? previous,
+        object current,
         bool previousOpensQuote,
         bool closesStraightQuote)
     {
@@ -66,10 +66,14 @@ public sealed class Sentence
         if (previousOpensQuote || closesStraightQuote)
             return false;
 
-        if (current is Punctuation && current.Value.Length == 1 && NoSpaceBefore.Contains(current.Value[0]))
+        if (current is Punctuation currentPunctuation &&
+            currentPunctuation.Value.Length == 1 &&
+            NoSpaceBefore.Contains(currentPunctuation.Value[0]))
             return false;
 
-        if (previous is Punctuation && previous.Value.Length == 1 && NoSpaceAfter.Contains(previous.Value[0]))
+        if (previous is Punctuation previousPunctuation &&
+            previousPunctuation.Value.Length == 1 &&
+            NoSpaceAfter.Contains(previousPunctuation.Value[0]))
             return false;
 
         return true;

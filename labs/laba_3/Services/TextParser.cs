@@ -39,7 +39,7 @@ public sealed partial class TextParser
                 straightQuoteIsOpen = false;
             }
 
-            Token token = isWord
+            object token = isWord
                 ? new Word(value)
                 : new Punctuation(value);
 
