@@ -11,7 +11,7 @@ public static class Program
 
         try
         {
-            var inputPath = args.Length > 0 ? args[0] : GetContentPath("input.txt");
+            var inputPath = GetContentPath("input.txt");
             var text = Text.ParseFile(inputPath);
             PrintConcordance(text.BuildConcordance());
         }
