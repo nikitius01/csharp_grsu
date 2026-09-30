@@ -62,6 +62,30 @@ public sealed partial class Text
         return text;
     }
 
+    public Dictionary<string, (int Count, SortedSet<int> Lines)> BuildConcordance()
+    {
+        var concordance = new Dictionary<string, (int Count, SortedSet<int> Lines)>(
+            StringComparer.OrdinalIgnoreCase);
+
+        foreach (var word in Sentences.SelectMany(sentence => sentence.Words))
+        {
+            var key = word.Value.ToLowerInvariant();
+
+            if (concordance.TryGetValue(key, out var entry))
+            {
+                entry.Count++;
+                entry.Lines.Add(word.LineNumber);
+                concordance[key] = entry;
+            }
+            else
+            {
+                concordance[key] = (1, new SortedSet<int> { word.LineNumber });
+            }
+        }
+
+        return concordance;
+    }
+
     public override string ToString() => string.Join(' ', Sentences);
 
     private static bool IsSentenceEnding(string value) =>
