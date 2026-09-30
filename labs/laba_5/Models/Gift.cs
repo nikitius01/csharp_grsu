@@ -32,20 +32,17 @@ public sealed class Gift : IEnumerable<IGiftItem>
     public IReadOnlyList<Candy> FindCandiesBySugar(double minimum, double maximum)
     {
         if (minimum is < 0 or > 100)
-            throw new ArgumentOutOfRangeException(nameof(minimum),
-                "Нижняя граница должна быть от 0 до 100 процентов.");
+            throw new ArgumentOutOfRangeException(nameof(minimum), "Нижняя граница должна быть от 0 до 100 процентов.");
 
         if (maximum is < 0 or > 100)
-            throw new ArgumentOutOfRangeException(nameof(maximum),
-                "Верхняя граница должна быть от 0 до 100 процентов.");
+            throw new ArgumentOutOfRangeException(nameof(maximum), "Верхняя граница должна быть от 0 до 100 процентов.");
 
         if (minimum > maximum)
             throw new ArgumentException("Нижняя граница не может быть больше верхней.");
 
         return _items
             .OfType<Candy>()
-            .Where(candy => candy.SugarContentPercent >= minimum &&
-                            candy.SugarContentPercent <= maximum)
+            .Where(candy => candy.SugarContentPercent >= minimum && candy.SugarContentPercent <= maximum)
             .ToList();
     }
 

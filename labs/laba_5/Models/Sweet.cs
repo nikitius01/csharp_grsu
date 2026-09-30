@@ -12,8 +12,7 @@ public abstract class Sweet : IGiftItem
             throw new ArgumentOutOfRangeException(nameof(weightGrams), "Вес должен быть положительным.");
 
         if (sugarContentPercent is < 0 or > 100)
-            throw new ArgumentOutOfRangeException(nameof(sugarContentPercent),
-                "Содержание сахара должно быть от 0 до 100 процентов.");
+            throw new ArgumentOutOfRangeException(nameof(sugarContentPercent), "Содержание сахара должно быть от 0 до 100 процентов.");
 
         Name = name;
         WeightGrams = weightGrams;
@@ -28,6 +27,5 @@ public abstract class Sweet : IGiftItem
 
     protected abstract string Description { get; }
 
-    public override string ToString() =>
-        $"{Name}: {Description}, {WeightGrams:g} г, сахар {SugarContentPercent:g}%";
+    public override string ToString() => $"{Name}: {Description}, {WeightGrams:g} г, сахар {SugarContentPercent:g}%";
 }
