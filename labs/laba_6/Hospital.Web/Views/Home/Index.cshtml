@@ -1,8 +1,40 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model PatientListViewModel
+@{
+    ViewData["Title"] = "Пациенты";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="page-heading">
+    <div><p class="eyebrow">Стационар · управление</p><h1>Пациенты</h1><p class="muted">Госпитализации, назначения и электронные медицинские карты.</p></div>
+    <a class="button button-primary" asp-action="Admit">+ Госпитализировать</a>
+</section>
+
+@if (TempData["Notice"] is string notice) { <div class="notice success">@notice</div> }
+@if (TempData["Error"] is string error) { <div class="notice error">@error</div> }
+
+<section class="metrics">
+    <article class="metric-card"><span>В стационаре</span><strong>@Model.ActiveCount</strong></article>
+    <article class="metric-card"><span>Выписано</span><strong>@Model.DischargedCount</strong></article>
+    <article class="metric-card"><span>Всего карт</span><strong>@Model.Patients.Count</strong></article>
+</section>
+
+<section class="panel">
+    <div class="panel-heading"><div><h2>Список пациентов</h2><p>Откройте карту пациента, чтобы добавить или выполнить назначение.</p></div></div>
+    @if (Model.Patients.Count == 0)
+    {
+        <div class="empty-state"><span class="empty-icon">✚</span><h3>Пока нет пациентов</h3><p>Создайте первую госпитализацию, чтобы открыть электронную медицинскую карту.</p><a class="button button-primary" asp-action="Admit">Добавить пациента</a></div>
+    }
+    else
+    {
+        <div class="table-scroll"><table class="data-table"><thead><tr><th>Пациент</th><th>Отделение</th><th>Лечащий врач</th><th>Поступление</th><th>Назначения</th><th>Статус</th><th></th></tr></thead><tbody>
+        @foreach (var patient in Model.Patients)
+        {
+            <tr>
+                <td><strong>@patient.FullName</strong><small>Дата рождения: @patient.BirthDate.ToString("dd.MM.yyyy")</small></td>
+                <td>@patient.Department</td><td>@patient.AttendingDoctor</td><td>@patient.AdmittedAt.ToString("dd.MM.yyyy")</td>
+                <td>@patient.Orders.Count</td><td><span class="status @(patient.IsDischarged ? "status-muted" : "status-active")">@(patient.IsDischarged ? "Выписан" : "В стационаре")</span></td>
+                <td><a class="table-link" asp-action="Details" asp-route-id="@patient.Id">Открыть →</a></td>
+            </tr>
+        }
+        </tbody></table></div>
+    }
+</section>

@@ -42,11 +42,13 @@ public sealed class MedicalOrder
 
     public void Validate()
     {
+        if (!Enum.IsDefined(Type)) throw new ValidationException("Выберите корректный тип назначения.");
         if (string.IsNullOrWhiteSpace(Name)) throw new ValidationException("Введите название назначения.");
         if (string.IsNullOrWhiteSpace(ResponsibleStaff)) throw new ValidationException("Укажите ответственного сотрудника.");
         if (Type == OrderType.Medication)
         {
             if (MedicationForm is null) throw new ValidationException("Выберите форму медикаментозного назначения.");
+            if (!Enum.IsDefined(MedicationForm.Value)) throw new ValidationException("Выберите корректную форму медикаментозного назначения.");
             if (MedicationForm == Hospital.Business.MedicationForm.Injection && (Quantity is null or <= 0))
                 throw new ValidationException("Для инъекции укажите количество больше нуля.");
             if (MedicationForm == Hospital.Business.MedicationForm.Tablet && (string.IsNullOrWhiteSpace(Dosage) || Days is null or <= 0))

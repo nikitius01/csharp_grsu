@@ -1,7 +1,9 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<Hospital.Data.IHospitalRepository>(_ =>
+    new Hospital.Data.HospitalRepository(Path.Combine(builder.Environment.ContentRootPath, "App_Data", "hospital.json")));
+builder.Services.AddScoped<Hospital.Services.HospitalService>();
 
 var app = builder.Build();
 

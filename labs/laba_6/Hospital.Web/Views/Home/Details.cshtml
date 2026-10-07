@@ -1,0 +1,98 @@
+@model PatientDetailsViewModel
+@{
+    ViewData["Title"] = "Медицинская карта";
+    var patient = Model.Patient;
+    var pendingCount = patient.Orders.Count(o => o.Status == OrderStatus.Planned);
+}
+<section class="page-heading compact-heading">
+    <div><a class="back-link" asp-action="Index">← Все пациенты</a><p class="eyebrow">@(patient.IsDischarged ? "Выписан" : "В стационаре") · ЭМК</p><h1>@patient.FullName</h1><p class="muted">@patient.Department · лечащий врач @patient.AttendingDoctor</p></div>
+    <div class="heading-badge">№ <span>@patient.Id.ToString("N")[..8].ToUpperInvariant()</span></div>
+</section>
+@if (TempData["Notice"] is string notice) { <div class="notice success">@notice</div> }
+@if (TempData["Error"] is string error) { <div class="notice error">@error</div> }
+
+<section class="patient-overview">
+    <article class="panel overview-main"><div class="panel-heading"><div><p class="eyebrow">Сведения о пациенте</p><h2>Госпитализация</h2></div><span class="status @(patient.IsDischarged ? "status-muted" : "status-active")">@(patient.IsDischarged ? "Выписан" : "В стационаре")</span></div>
+        <dl class="details-grid"><div><dt>Дата рождения</dt><dd>@patient.BirthDate.ToString("dd.MM.yyyy")</dd></div><div><dt>Телефон</dt><dd>@(string.IsNullOrWhiteSpace(patient.Phone) ? "Не указан" : patient.Phone)</dd></div><div><dt>Поступил</dt><dd>@patient.AdmittedAt.ToString("dd.MM.yyyy, HH:mm")</dd></div><div><dt>Отделение</dt><dd>@patient.Department</dd></div><div class="detail-wide"><dt>Диагноз при поступлении</dt><dd>@patient.AdmissionDiagnosis</dd></div></dl>
+    </article>
+    <article class="metric-card side-metric"><span>Назначения</span><strong>@patient.Orders.Count</strong><small>@pendingCount ожидают выполнения</small></article>
+</section>
+
+<div class="content-columns">
+    <div class="main-column">
+        <section class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">План лечения</p><h2>Назначения врача</h2></div></div>
+            @if (patient.Orders.Count == 0) { <p class="muted empty-inline">Назначений пока нет.</p> }
+            else { <div class="order-list">
+                @foreach (var order in patient.Orders.OrderByDescending(o => o.CreatedAt))
+                {
+                    var kind = order.Type switch { OrderType.Medication => "Медикаментозное", OrderType.Diagnostic => "Диагностическое", _ => "Профилактическое" };
+                    var details = order.Type == OrderType.Medication
+                        ? order.MedicationForm == MedicationForm.Injection ? $"Инъекция · количество: {order.Quantity}" : $"Таблетки · {order.Dosage} · {order.Days} дн."
+                        : kind;
+                    <article class="order-row"><div class="order-icon @(order.Type == OrderType.Medication ? "icon-medicine" : order.Type == OrderType.Diagnostic ? "icon-diagnostic" : "icon-preventive")">@(order.Type == OrderType.Medication ? "＋" : order.Type == OrderType.Diagnostic ? "⌕" : "✳")</div><div class="order-copy"><div class="order-title"><strong>@order.Name</strong><span class="status @(order.Status == OrderStatus.Completed ? "status-done" : "status-waiting")">@(order.Status == OrderStatus.Completed ? "Выполнено" : "Ожидает")</span></div><p>@details · ответственный: @order.ResponsibleStaff</p><small>Назначено @order.CreatedAt.ToString("dd.MM.yyyy, HH:mm")@(order.CompletedAt is null ? "" : $" · выполнено {order.CompletedAt:dd.MM.yyyy, HH:mm}")</small></div>
+                        @if (!patient.IsDischarged && order.Status == OrderStatus.Planned) { <form asp-action="CompleteOrder" method="post"><input type="hidden" name="id" value="@patient.Id"/><input type="hidden" name="orderId" value="@order.Id"/><button type="submit" class="button button-small button-quiet">Отметить выполненным</button></form> }
+                    </article>
+                }
+            </div> }
+        </section>
+
+        @if (!patient.IsDischarged)
+        {
+            <section class="panel">
+                <div class="panel-heading"><div><p class="eyebrow">Новый пункт плана лечения</p><h2>Добавить назначение</h2></div></div>
+                <form asp-action="AddOrder" method="post" class="form-grid order-form">
+                    <input type="hidden" name="id" value="@patient.Id"/>
+                    <div class="field"><label for="Type">Тип назначения</label><select id="Type" name="Type"><option value="0">Медикаментозное</option><option value="1">Диагностическое</option><option value="2">Профилактическое</option></select></div>
+                    <div class="field"><label for="Name">Название / процедура</label><input id="Name" name="Name" required placeholder="Например, анализ крови"/></div>
+                    <div class="field medication-fields"><label for="MedicationForm">Форма</label><select id="MedicationForm" name="MedicationForm"><option value="0">Инъекция</option><option value="1">Таблетки</option></select></div>
+                    <div class="field injection-fields medication-fields"><label for="Quantity">Количество инъекций</label><input id="Quantity" name="Quantity" type="number" min="1"/></div>
+                    <div class="field tablet-fields medication-fields"><label for="Dosage">Дозировка</label><input id="Dosage" name="Dosage" placeholder="Например, 1 таблетка 2 раза в день"/></div>
+                    <div class="field tablet-fields medication-fields"><label for="Days">Дней приема</label><input id="Days" name="Days" type="number" min="1"/></div>
+                    <div class="field field-wide"><label for="ResponsibleStaff">Ответственный сотрудник</label>
+                        <select id="ResponsibleStaff" name="ResponsibleStaff" class="staff-nurses">@foreach (var person in Model.Nurses) { <option>@person</option> }</select>
+                        <select name="ResponsibleStaff" class="staff-doctors" disabled>@foreach (var person in Model.Doctors) { <option>@person</option> }</select>
+                    </div>
+                    <div class="field-wide form-actions"><button type="submit" class="button button-primary">Добавить назначение</button></div>
+                </form>
+            </section>
+        }
+
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">Хронология</p><h2>Записи в ЭМК</h2></div></div>
+            <div class="timeline">@foreach (var entry in patient.Record.OrderByDescending(e => e.OccurredAt)) { <article class="timeline-entry"><span class="timeline-dot"></span><div><strong>@entry.Text</strong><p>@entry.Author · @entry.OccurredAt.ToString("dd.MM.yyyy, HH:mm")</p></div></article> }</div>
+        </section>
+    </div>
+
+    <aside class="side-column">
+        @if (patient.DischargeSummary is not null)
+        {
+            <section class="panel summary-panel"><p class="eyebrow">Итог лечения</p><h2>Выписной эпикриз</h2><dl class="summary-list"><div><dt>Пациент</dt><dd>@patient.DischargeSummary.PatientName</dd></div><div><dt>Период пребывания</dt><dd>@patient.DischargeSummary.AdmittedAt.ToString("dd.MM.yyyy") — @patient.DischargeSummary.DischargedAt.ToString("dd.MM.yyyy")</dd></div><div><dt>Диагноз при поступлении</dt><dd>@patient.DischargeSummary.AdmissionDiagnosis</dd></div><div><dt>Выполнено назначений</dt><dd>@patient.DischargeSummary.CompletedOrders.Count</dd></div></dl>
+                @if (patient.DischargeSummary.CompletedOrders.Count > 0) { <h3>Перечень выполненного</h3><ul class="summary-orders">@foreach (var item in patient.DischargeSummary.CompletedOrders) { <li>@item</li> }</ul> }
+            </section>
+        }
+        else if (!patient.IsDischarged)
+        {
+            <section class="panel discharge-panel"><p class="eyebrow">Завершение лечения</p><h2>Выписать пациента</h2><p>Будет сформирован эпикриз с периодом пребывания и перечнем выполненных назначений.</p>@if (pendingCount > 0) { <div class="notice hint">Сначала выполните оставшиеся назначения (@pendingCount).</div> }<form asp-action="Discharge" method="post"><input type="hidden" name="id" value="@patient.Id"/><button class="button button-outline" type="submit">Сформировать эпикриз и выписать</button></form></section>
+        }
+    </aside>
+</div>
+
+@section Scripts { <script>
+    const typeSelect = document.getElementById('Type');
+    if (typeSelect) {
+        const medicationForm = document.getElementById('MedicationForm');
+        const nurses = document.querySelector('.staff-nurses');
+        const doctors = document.querySelector('.staff-doctors');
+        function refreshOrderFields() {
+            const isMedication = typeSelect.value === '0';
+            document.querySelectorAll('.medication-fields').forEach(x => x.hidden = !isMedication);
+            document.querySelectorAll('.injection-fields').forEach(x => x.hidden = !isMedication || medicationForm.value !== '0');
+            document.querySelectorAll('.tablet-fields').forEach(x => x.hidden = !isMedication || medicationForm.value !== '1');
+            nurses.disabled = !isMedication;
+            doctors.disabled = isMedication;
+        }
+        typeSelect.addEventListener('change', refreshOrderFields);
+        medicationForm.addEventListener('change', refreshOrderFields);
+        refreshOrderFields();
+    }
+</script> }

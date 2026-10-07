@@ -1,0 +1,22 @@
+@model AdmitPatientViewModel
+@{
+    ViewData["Title"] = "Госпитализация";
+}
+<section class="page-heading compact-heading"><div><a class="back-link" asp-action="Index">← Все пациенты</a><p class="eyebrow">Новая карта</p><h1>Госпитализация</h1><p class="muted">Дежурный врач фиксирует данные пациента и направляет его в отделение.</p></div></section>
+<section class="panel form-panel">
+    <form asp-action="Admit" method="post">
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <div class="form-section"><h2>Данные пациента</h2><div class="form-grid">
+            <div class="field field-wide"><label asp-for="FullName">ФИО пациента</label><input asp-for="FullName" placeholder="Например, Иванов Иван Иванович"/><span asp-validation-for="FullName"></span></div>
+            <div class="field"><label asp-for="BirthDate">Дата рождения</label><input asp-for="BirthDate" type="date"/><span asp-validation-for="BirthDate"></span></div>
+            <div class="field"><label asp-for="Phone">Телефон</label><input asp-for="Phone" placeholder="+375 …"/><span asp-validation-for="Phone"></span></div>
+        </div></div>
+        <div class="form-section"><h2>Первичный осмотр</h2><div class="form-grid">
+            <div class="field field-wide"><label asp-for="AdmissionDiagnosis">Диагноз при поступлении</label><textarea asp-for="AdmissionDiagnosis" rows="3" placeholder="Предварительный диагноз"></textarea><span asp-validation-for="AdmissionDiagnosis"></span></div>
+            <div class="field"><label asp-for="Department">Отделение</label><select asp-for="Department"><option value="">Выберите отделение</option>@foreach (var item in Model.Departments) { <option value="@item">@item</option> }</select><span asp-validation-for="Department"></span></div>
+            <div class="field"><label asp-for="AttendingDoctor">Лечащий врач</label><select asp-for="AttendingDoctor"><option value="">Выберите врача</option>@foreach (var item in Model.Doctors) { <option value="@item">@item</option> }</select><span asp-validation-for="AttendingDoctor"></span></div>
+        </div></div>
+        <div class="form-actions"><a class="button button-quiet" asp-action="Index">Отмена</a><button class="button button-primary" type="submit">Создать ЭМК и госпитализировать</button></div>
+    </form>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
