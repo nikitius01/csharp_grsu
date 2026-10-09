@@ -28,3 +28,6 @@ _ReSharper*/
 # NuGet Packages
 *.nupkg
 [Pp]ackages/
+
+# laba_6 db
+labs/laba_6/Hospital.Web/App_Data/hospital.json
