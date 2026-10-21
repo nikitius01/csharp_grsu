@@ -141,6 +141,7 @@ h3 { font-size: .95rem; }
 .summary-list { display: grid; gap: 13px; margin: 0; }
 .summary-orders { padding-left: 18px; color: #5e7178; font-size: .77rem; line-height: 1.55; }
 .summary-panel h3 { margin: 18px 0 8px; }
+.pdf-button { width: 100%; margin-top: 17px; text-align: center; }
 .discharge-panel > p:not(.eyebrow) { font-size: .82rem; line-height: 1.55; color: var(--muted); }
 .discharge-panel form { margin-top: 15px; }
 [hidden] { display: none !important; }

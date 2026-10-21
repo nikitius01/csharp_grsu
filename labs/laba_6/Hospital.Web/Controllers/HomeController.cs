@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hospital.Web.Controllers;
 
-public sealed class HomeController(HospitalService hospital) : Controller
+public sealed class HomeController(HospitalService hospital, DischargeReportService dischargeReports) : Controller
 {
     public IActionResult Index()
     {
@@ -53,6 +53,21 @@ public sealed class HomeController(HospitalService hospital) : Controller
         var patient = hospital.GetPatient(id);
         if (patient is null) return NotFound();
         return View(new PatientDetailsViewModel { Patient = patient, Doctors = hospital.Doctors, Nurses = hospital.Nurses });
+    }
+
+    [HttpGet]
+    public IActionResult ExportDischargePdf(Guid id)
+    {
+        var patient = hospital.GetPatient(id);
+        if (patient is null) return NotFound();
+        if (!patient.IsDischarged || patient.DischargeSummary is null)
+        {
+            TempData["Error"] = "Экспортный эпикриз доступен после выписки пациента.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        var pdf = dischargeReports.CreatePdf(patient);
+        return File(pdf, "application/pdf", $"epikriz-{patient.Id:N}.pdf");
     }
 
     [HttpPost]

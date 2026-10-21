@@ -68,6 +68,7 @@
         {
             <section class="panel summary-panel"><p class="eyebrow">Итог лечения</p><h2>Выписной эпикриз</h2><dl class="summary-list"><div><dt>Пациент</dt><dd>@patient.DischargeSummary.PatientName</dd></div><div><dt>Период пребывания</dt><dd>@patient.DischargeSummary.AdmittedAt.ToString("dd.MM.yyyy") — @patient.DischargeSummary.DischargedAt.ToString("dd.MM.yyyy")</dd></div><div><dt>Диагноз при поступлении</dt><dd>@patient.DischargeSummary.AdmissionDiagnosis</dd></div><div><dt>Выполнено назначений</dt><dd>@patient.DischargeSummary.CompletedOrders.Count</dd></div></dl>
                 @if (patient.DischargeSummary.CompletedOrders.Count > 0) { <h3>Перечень выполненного</h3><ul class="summary-orders">@foreach (var item in patient.DischargeSummary.CompletedOrders) { <li>@item</li> }</ul> }
+                <a class="button button-primary pdf-button" asp-action="ExportDischargePdf" asp-route-id="@patient.Id">Скачать эпикриз в PDF</a>
             </section>
         }
         else if (!patient.IsDischarged)

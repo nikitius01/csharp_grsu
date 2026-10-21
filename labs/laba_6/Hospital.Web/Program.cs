@@ -1,9 +1,12 @@
 var builder = WebApplication.CreateBuilder(args);
 
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<Hospital.Data.IHospitalRepository>(_ =>
     new Hospital.Data.HospitalRepository(Path.Combine(builder.Environment.ContentRootPath, "App_Data", "hospital.json")));
 builder.Services.AddScoped<Hospital.Services.HospitalService>();
+builder.Services.AddScoped<Hospital.Services.DischargeReportService>();
 
 var app = builder.Build();
 
